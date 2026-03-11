@@ -10,11 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Point Laravel storage to writable /tmp directory
-$app = require __DIR__ . '/../bootstrap/app.php';
-$app->useStoragePath('/tmp/storage');
+// Load autoloader FIRST
+require __DIR__ . '/../vendor/autoload.php';
 
-// Create required directories in /tmp
+// Create storage directories in /tmp
 $dirs = [
     '/tmp/storage/framework/cache/data',
     '/tmp/storage/framework/sessions',
@@ -24,6 +23,10 @@ $dirs = [
 foreach ($dirs as $dir) {
     if (!is_dir($dir)) mkdir($dir, 0777, true);
 }
+
+// Boot Laravel
+$app = require __DIR__ . '/../bootstrap/app.php';
+$app->useStoragePath('/tmp/storage');
 
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 $response = $kernel->handle($request = Illuminate\Http\Request::capture());
