@@ -26,4 +26,4 @@ return Application::configure(basePath: dirname(__DIR__))
                 'exception' => get_class($e),
             ], $status);
         });
-    })->create();
+    })->create(); 
