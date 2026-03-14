@@ -14,15 +14,16 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         //
     })
+    
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (\Throwable $e, $request) {
-            $status = method_exists($e, 'getStatusCode')
-                ? $e->getStatusCode()
-                : 500;
+    $exceptions->render(function (\Throwable $e, $request) {
+        $status = method_exists($e, 'getStatusCode')
+            ? $e->getStatusCode()
+            : 500;
 
-            return response()->json([
-                'message' => $e->getMessage(),
-                'exception' => get_class($e),
-            ], $status);
-        });
-    })->create();
+        return new \Illuminate\Http\JsonResponse([
+            'message' => $e->getMessage(),
+            'exception' => get_class($e),
+        ], $status);
+    });
+})->create();
