@@ -15,7 +15,6 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // ADD THIS BLOCK
         $exceptions->render(function (\Throwable $e, $request) {
             $status = method_exists($e, 'getStatusCode')
                 ? $e->getStatusCode()
@@ -26,4 +25,4 @@ return Application::configure(basePath: dirname(__DIR__))
                 'exception' => get_class($e),
             ], $status);
         });
-    })->create(); 
+    })->create();
