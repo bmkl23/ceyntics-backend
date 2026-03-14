@@ -12,13 +12,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->statefulApi();
-        $middleware->alias([
-            'role' => \App\Http\Middleware\RoleMiddleware::class,
-        ]);
+        //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->shouldRenderJsonWhen(function ($request) {
-            return $request->is('api/*');
+        // ADD THIS BLOCK
+        $exceptions->render(function (\Throwable $e, $request) {
+            $status = method_exists($e, 'getStatusCode')
+                ? $e->getStatusCode()
+                : 500;
+
+            return response()->json([
+                'message' => $e->getMessage(),
+                'exception' => get_class($e),
+            ], $status);
         });
     })->create();
