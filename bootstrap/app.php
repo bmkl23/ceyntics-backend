@@ -4,10 +4,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
-// Step 1 — create the app instance directly
 $app = new Application(dirname(__DIR__));
 
-// Step 2 — redirect to /tmp BEFORE routes are registered
 if (!is_writable(dirname(__DIR__) . '/bootstrap/cache')) {
     foreach ([
         '/tmp/storage/framework/cache/data',
@@ -24,8 +22,8 @@ if (!is_writable(dirname(__DIR__) . '/bootstrap/cache')) {
     $app->useBootstrapPath('/tmp/bootstrap');
 }
 
-// Step 3 — configure using the pre-configured app instance
 return (new Illuminate\Foundation\Configuration\ApplicationBuilder($app))
+    ->withKernels()
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
