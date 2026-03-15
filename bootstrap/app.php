@@ -11,10 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         using: function () {
             Route::middleware('api')
                 ->prefix('api')
-                ->group(dirname(__DIR__).'/routes/api.php');
+                ->group(base_path('routes/api.php'));
 
             Route::middleware('web')
-                ->group(dirname(__DIR__).'/routes/web.php');
+                ->group(base_path('routes/web.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware) {
