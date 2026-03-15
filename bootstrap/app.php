@@ -24,6 +24,9 @@ if (!is_writable(dirname(__DIR__) . '/bootstrap/cache')) {
 
 return (new Illuminate\Foundation\Configuration\ApplicationBuilder($app))
     ->withKernels()
+    ->withEvents()
+    ->withCommands()
+    ->withProviders()
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
