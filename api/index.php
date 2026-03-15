@@ -13,9 +13,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+foreach ([
+    '/tmp/storage/framework/cache/data',
+    '/tmp/storage/framework/sessions',
+    '/tmp/storage/framework/views',
+    '/tmp/storage/framework/testing',
+    '/tmp/storage/logs',
+    '/tmp/storage/app/public',
+] as $dir) {
+    if (!is_dir($dir)) mkdir($dir, 0777, true);
+}
+
 require __DIR__ . '/../vendor/autoload.php';
 
 $app = require __DIR__ . '/../bootstrap/app.php';
+$app->useStoragePath('/tmp/storage');
 
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 $response = $kernel->handle($request = Illuminate\Http\Request::capture());
