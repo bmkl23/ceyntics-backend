@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Foundation\Application;
@@ -8,13 +7,14 @@ use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
         health: '/up',
-        api: function () {
+        using: function () {
             Route::middleware('api')
                 ->prefix('api')
                 ->group(dirname(__DIR__).'/routes/api.php');
+
+            Route::middleware('web')
+                ->group(dirname(__DIR__).'/routes/web.php');
         },
     )
     ->withMiddleware(function (Middleware $middleware) {
