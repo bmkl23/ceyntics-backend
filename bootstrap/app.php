@@ -31,5 +31,4 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
     })
-    ->withViewPath('/tmp/views')  // Pre-set writable views path
     ->create();

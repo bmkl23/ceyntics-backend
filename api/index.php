@@ -13,13 +13,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require __DIR__.'/../vendor/autoload.php';
-
 $app = require __DIR__.'/../bootstrap/app.php';
 
-// Set ALL writable paths to /tmp subdirs (Vercel-safe)
+// CRITICAL: Set ALL writable paths AFTER app creation
 $app->useStoragePath('/tmp/storage');
 $app->useCachePath('/tmp/cache');
-$app->useViewPath('/tmp/views');  // Fix Blade compiler
+$app->useViewPath('/tmp/views');
+
+// Pre-create tmp subdirs (Vercel allows /tmp writes)
+$dirs = ['storage/framework/views', 'storage/framework/cache', 'storage/framework/sessions'];
+foreach ($dirs as $dir) {
+    $fullPath = '/tmp/' . $dir;
+    if (!is_dir($fullPath)) {
+        mkdir($fullPath, 0777, true);
+    }
+}
 
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 $response = $kernel->handle(
