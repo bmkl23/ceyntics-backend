@@ -29,12 +29,6 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = require __DIR__ . '/../bootstrap/app.php';
 $app->useStoragePath('/tmp/storage');
 
-// Force load routes directly
-$app->booted(function () use ($app) {
-    $router = $app->make('router');
-    $router->middleware('api')->prefix('api')->group(dirname(__DIR__) . '/routes/api.php');
-});
-
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 $response = $kernel->handle($request = Illuminate\Http\Request::capture());
 $response->send();
