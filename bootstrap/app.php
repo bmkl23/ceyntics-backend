@@ -3,21 +3,38 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        commands: __DIR__.'/../routes/console.php',
         health: '/up',
         using: function () {
-            // EMBED ROUTES DIRECTLY - NO file loading issues
-            Route::post('/api/auth/login', [AuthController::class, 'login']);
-            
-            Route::middleware('auth:sanctum')->group(function () {
-                Route::post('/api/auth/logout', [AuthController::class, 'logout']);
-                Route::get('/api/auth/me', [AuthController::class, 'me']);
-                // Add other routes as needed...
+            // INLINE LOGIN ROUTE - NO CONTROLLERS NEEDED
+            Route::post('/api/auth/login', function (Request $request) {
+                $request->validate([
+                    'email' => 'required|email',
+                    'password' => 'required',
+                ]);
+
+                $user = DB::table('users')
+                    ->where('email', $request->email)
+                    ->first();
+
+                if (!$user || !Hash::check($request->password, $user->password)) {
+                    throw ValidationException::withMessages([
+                        'email' => ['Invalid credentials'],
+                    ]);
+                }
+
+                // Simple token response (replace with Sanctum later)
+                return response()->json([
+                    'token' => base64_encode($user->id . ':' . $user->email),
+                    'user' => $user
+                ]);
             });
         }
     )
@@ -25,13 +42,11 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+        $exceptions->render(function (\Throwable $e, Request $request) {
             if ($request->is('api/*')) {
-                $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
                 return response()->json([
                     'message' => $e->getMessage(),
-                    'exception' => get_class($e),
-                ], $status);
+                ], 422);
             }
         });
     })->create();
