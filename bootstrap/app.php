@@ -4,26 +4,21 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         using: function () {
-            // FORCE LOAD ROUTES - Vercel-safe absolute paths
-            $apiRoutes = __DIR__.'/../routes/api.php';
-            $webRoutes = __DIR__.'/../routes/web.php';
+            // EMBED ROUTES DIRECTLY - NO file loading issues
+            Route::post('/api/auth/login', [AuthController::class, 'login']);
             
-            if (file_exists($apiRoutes)) {
-                Route::middleware('api')
-                    ->prefix('api')
-                    ->group($apiRoutes);
-            }
-            
-            if (file_exists($webRoutes)) {
-                Route::middleware('web')
-                    ->group($webRoutes);
-            }
+            Route::middleware('auth:sanctum')->group(function () {
+                Route::post('/api/auth/logout', [AuthController::class, 'logout']);
+                Route::get('/api/auth/me', [AuthController::class, 'me']);
+                // Add other routes as needed...
+            });
         }
     )
     ->withMiddleware(function (Middleware $middleware) {
