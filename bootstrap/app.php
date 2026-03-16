@@ -1,4 +1,3 @@
-cat > bootstrap/app.php << 'EOF'
 <?php
 
 use Illuminate\Foundation\Application;
